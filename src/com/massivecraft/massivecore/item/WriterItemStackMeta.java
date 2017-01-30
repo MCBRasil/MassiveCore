@@ -27,6 +27,7 @@ public class WriterItemStackMeta extends WriterAbstractItemStackMetaMorph<Object
 			
 			// MAP
 			WriterItemStackMetaScaling.class,
+			WriterItemStackMetaMapColor.class,
 			
 			// POTION EFFECTS
 			WriterItemStackMetaPotionEffects.class,
@@ -59,7 +60,8 @@ public class WriterItemStackMeta extends WriterAbstractItemStackMetaMorph<Object
 			WriterItemStackMetaShieldPatterns.class,
 			
 			// POTION
-			WriterItemStackMetaPotion.class
+			WriterItemStackMetaPotion.class,
+			WriterItemStackMetaPotionColor.class
 		);
 	}
 	

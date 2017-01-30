@@ -78,6 +78,8 @@ public class DataItemStack implements Comparable<DataItemStack>
 	public static final transient Integer DEFAULT_BANNER_BASE = null;
 	public static final transient List<DataBannerPattern> DEFAULT_BANNER_PATTERNS = Collections.emptyList();
 	public static final transient String DEFAULT_POTION = "water";
+	public static final transient Integer DEFAULT_POTION_COLOR = null;
+	public static final transient Integer DEFAULT_MAP_COLOR = null;
 	
 	// -------------------------------------------- //
 	// FIELDS > BASIC
@@ -264,6 +266,26 @@ public class DataItemStack implements Comparable<DataItemStack>
 	public DataItemStack setPotion(String potion) { this.potion = set(potion, DEFAULT_POTION); return this; }
 	
 	// -------------------------------------------- //
+	// FIELDS > POTION COLOR
+	// -------------------------------------------- //
+	// SINCE: 1.11
+	
+	@EditorType(TypeConverterColor.class)
+	private Integer potionColor = null;
+	public Integer getPotionColor() { return get(this.potionColor, DEFAULT_POTION_COLOR); }
+	public DataItemStack setPotionColor(Integer potionColor) { this.potionColor = set(potionColor, DEFAULT_POTION_COLOR); return this; }
+	
+	// -------------------------------------------- //
+	// FIELDS > MAP COLOR
+	// -------------------------------------------- //
+	// Since 1.11
+	
+	@EditorType(TypeConverterColor.class)
+	private Integer mapColor = null;
+	public Integer getMapColor() { return get(this.mapColor, DEFAULT_MAP_COLOR); }
+	public DataItemStack setMapColor(Integer mapColor) { this.mapColor = set(mapColor, DEFAULT_MAP_COLOR); return this; }
+	
+	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
 	
@@ -425,7 +447,9 @@ public class DataItemStack implements Comparable<DataItemStack>
 			this.getFlags(), that.getFlags(),
 			this.getBannerBase(), that.getBannerBase(),
 			this.getBannerPatterns(), that.getBannerPatterns(),
-			this.getPotion(), that.getPotion()
+			this.getPotion(), that.getPotion(),
+			this.getPotionColor(), that.getPotionColor(),
+			this.getMapColor(), that.getMapColor()
 		);
 	}
 	
@@ -457,7 +481,9 @@ public class DataItemStack implements Comparable<DataItemStack>
 			this.getFlags(), that.getFlags(),
 			this.getBannerBase(), that.getBannerBase(),
 			this.getBannerPatterns(), that.getBannerPatterns(),
-			this.getPotion(), that.getPotion()
+			this.getPotion(), that.getPotion(),
+			this.getPotionColor(), that.getPotionColor(),
+			this.getMapColor(), that.getMapColor()
 		);
 	}
 	
@@ -496,7 +522,9 @@ public class DataItemStack implements Comparable<DataItemStack>
 			this.getFlags(), that.getFlags(),
 			this.getBannerBase(), that.getBannerBase(),
 			this.getBannerPatterns(), that.getBannerPatterns(),
-			this.getPotion(), that.getPotion()
+			this.getPotion(), that.getPotion(),
+			this.getPotionColor(), that.getPotionColor(),
+			this.getMapColor(), that.getMapColor()
 		);
 	}
 	
@@ -533,7 +561,9 @@ public class DataItemStack implements Comparable<DataItemStack>
 			this.getFlags(),
 			this.getBannerBase(),
 			this.getBannerPatterns(),
-			this.getPotion()
+			this.getPotion(),
+			this.getPotionColor(),
+			this.getMapColor()
 		);
 	}
 	
