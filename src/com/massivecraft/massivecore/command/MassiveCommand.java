@@ -28,6 +28,7 @@ import com.massivecraft.massivecore.command.requirement.Requirement;
 import com.massivecraft.massivecore.command.requirement.RequirementAbstract;
 import com.massivecraft.massivecore.command.requirement.RequirementHasPerm;
 import com.massivecraft.massivecore.command.type.Type;
+import com.massivecraft.massivecore.command.type.enumeration.TypeEnum;
 import com.massivecraft.massivecore.mixin.MixinMessage;
 import com.massivecraft.massivecore.mson.Mson;
 import com.massivecraft.massivecore.predicate.PredicateStartsWithIgnoreCase;
@@ -183,7 +184,20 @@ public class MassiveCommand implements Active, PluginIdentifiableCommand
 	protected List<?> help = new ArrayList<>();
 	
 	// The visibility of this command in help command.
-	protected Visibility visibility = Visibility.VISIBLE; 
+	protected Visibility visibility = Visibility.VISIBLE;
+
+	// === SETUP ===
+
+	// Determines whether the smart setup process will be used, works for most of commands
+	protected boolean settingUpStandard = false;
+
+	// A base prefix such as "CmdFactions" that all names of commands in a plugin start with.
+	// Used for finding the right permission.
+	// Should be set in a super class for all the commands in a plugin.
+	protected String basePrefix = null;
+
+	// The Class representing the permissions.
+	protected Class<? extends Enum<?>> permClazz = null;
 	
 	// === EXECUTION ===
 	
@@ -302,6 +316,9 @@ public class MassiveCommand implements Active, PluginIdentifiableCommand
 		// Apply
 		this.parent = parent;
 		parent.addChild(this);
+
+		// Setup
+		if (this.isSettingUpStandard()) this.setupStandard();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -888,7 +905,77 @@ public class MassiveCommand implements Active, PluginIdentifiableCommand
 		if (this.getVisibility() == Visibility.INVISIBLE) return false;
 		return this.isRequirementsMet(sender, false);
 	}
-	
+
+	// -------------------------------------------- //
+	// SETUP
+	// -------------------------------------------- //
+
+	public boolean isSettingUpStandard() { return this.settingUpStandard; }
+	public void setSettingUpStandard(boolean settingUpStandard) { this.settingUpStandard = settingUpStandard; }
+
+	public String getBasePrefix(){ return this.basePrefix; }
+	public void setBasePrefix(String basePrefix) { this.basePrefix = basePrefix; }
+
+	public <T extends Enum<T>> Class<T> getPermClazz(){ return (Class) this.permClazz; }
+	public <T extends Enum<T>> void setPermClazz(Class<T> permClazz) { this.permClazz = permClazz; }
+
+	public <T extends Enum<T>> void setupStandard()
+	{
+		String name = calcName(this.getParent());
+		if (name != null) this.getAliases().add(0, name);
+
+		Object permission = calcPermission(this.getPermClazz(), this.getBasePrefix());
+		if (permission != null) this.addRequirements(RequirementHasPerm.get(permission));
+	}
+
+	protected String calcName(MassiveCommand parent)
+	{
+		// Get name of parent ...
+		String parentName = parent.getClass().getSimpleName();
+
+		// ... and only try if the names match ...
+		String name = this.getClass().getSimpleName();
+		if ( ! name.startsWith(parentName)) return null;
+
+		// ... and without parent prefix ...
+		String ret = name.substring(parentName.length());
+
+		// ... and always lowercase.
+		ret = ret.toLowerCase();
+
+		return ret;
+	}
+
+	protected <T extends Enum<T>> T calcPermission(Class<T> permClazz, String basePrefix)
+	{
+		if (permClazz == null) return null;
+		if (basePrefix == null) return null;
+
+		// Only try if the name matches with the expected prefix ...
+		String name = this.getClass().getSimpleName();
+		if ( ! name.startsWith(basePrefix)) return null;
+
+		// ... and remove the prefix  ...
+		String permName = name.substring(basePrefix.length());
+
+		// ... split at new words and separate with underscore.
+		permName = Txt.implode(Txt.camelsplit(permName), "_");
+
+		// Enums are alway upper case.
+		permName = permName.toUpperCase();
+
+		// We also try another version wihtout underscores.
+		String permName2 = permName.replace("_", "");
+
+		for (T perm : TypeEnum.getEnumValues(permClazz))
+		{
+			if (perm.name().equals(permName)) return perm;
+			if (perm.name().equals(permName2)) return perm;
+		}
+
+		throw new RuntimeException("Could not find permission matching: " + permName);
+	}
+
 	// -------------------------------------------- //
 	// EXECUTION
 	// -------------------------------------------- //
