@@ -104,9 +104,19 @@ import com.massivecraft.massivecore.store.ModificationPollerLocal;
 import com.massivecraft.massivecore.store.ModificationPollerRemote;
 import com.massivecraft.massivecore.test.TestTypeEnchantment;
 import com.massivecraft.massivecore.util.BoardUtil;
+import com.massivecraft.massivecore.util.ContainerUtil;
+import com.massivecraft.massivecore.util.EventUtil;
 import com.massivecraft.massivecore.util.IdUtil;
+import com.massivecraft.massivecore.util.IntervalUtil;
+import com.massivecraft.massivecore.util.InventoryUtil;
 import com.massivecraft.massivecore.util.MUtil;
+import com.massivecraft.massivecore.util.PeriodUtil;
 import com.massivecraft.massivecore.util.PlayerUtil;
+import com.massivecraft.massivecore.util.RecipeUtil;
+import com.massivecraft.massivecore.util.ReflectionUtil;
+import com.massivecraft.massivecore.util.SignUtil;
+import com.massivecraft.massivecore.util.SmokeUtil;
+import com.massivecraft.massivecore.util.TimeDiffUtil;
 import com.massivecraft.massivecore.util.TimeUnit;
 import com.massivecraft.massivecore.util.Txt;
 import com.massivecraft.massivecore.xlib.gson.Gson;
@@ -229,8 +239,20 @@ public class MassiveCore extends MassivePlugin
 	@Override
 	public void onLoadInner()
 	{
-		// Attempting to fix a race condition within the class asynchronous class loader.
-		System.out.println(TimeUnit.DAY);
+		// Fix a race condition within the asynchronous class loader by pre-loading util classes.
+		// These specific classes are not naturally loaded after MassiveCore is enabled, but should be to ensure async safety.
+		ReflectionUtil.forceLoadClasses(
+			ContainerUtil.class,
+			EventUtil.class,
+			IntervalUtil.class,
+			InventoryUtil.class,
+			PeriodUtil.class,
+			RecipeUtil.class,
+			SignUtil.class,
+			SmokeUtil.class,
+			TimeUnit.class,
+			TimeDiffUtil.class
+		);
 	}
 	
 	// -------------------------------------------- //
